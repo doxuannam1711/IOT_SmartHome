@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+   <!-- Required meta tags -->
+   <meta charset="utf-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1">
+
+   <!-- Bootstrap CSS -->
+   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+      integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+   <title></title>
+</head>
+
+<body>
+   <style>
+      #cards {
+         height: 600px;
+         overflow-y: scroll;
+      }
+
+      /* Control relay */
+      body {
+         text-align: center;
+         user-select: none;
+      }
+
+      h1 {
+         color: #003399;
+      }
+
+      a {
+         text-decoration: none;
+         color: #FFFFFF;
+      }
+
+      /* Start btn control */
+      #form1 {
+         display: inline-block;
+      }
+
+      .btn {
+         width: 100px;
+         height: 50px;
+         color: #fff;
+         font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+         font-size: 16px;
+         padding: 8px;
+         border-radius: 50px;
+         border: solid 1px #000;
+         cursor: pointer;
+      }
+
+      #form1 .btn-on {
+         background-color: #FF6600;
+      }
+
+      #form1 .btn-off {
+         background-color: #00FF00;
+      }
+
+      /* End btn control */
+
+
+
+      /* Clear table button */
+      .btn-clear {
+         background-color: #00a8a9;
+         color: #fff;
+         font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+         font-size: 16px;
+         border: none;
+         padding: 8px;
+
+      }
+   </style>
+
+
+
+
+   <!-- Start Control relay -->
+   <div class="control">
+      <h1>IOT NHÓM 1: SMART HOME</h1>
+
+      <form id="form1" action="/AUTO" method="post">
+         <button onclick="autoActivate()">AUTO</button>
+      </form>
+      <button onclick="manualActivate()">CONTROL</button>
+
+
+
+      <div style="margin: 25px 0;">
+         <form id="form1" action="/ON" method="post">
+            <input id="btnOn" class="btn btn-on" type="submit" value="ON" disabled="true">
+         </form>
+         <form id="form1" action="/OFF" method="post">
+            <input id="btnOff" class="btn btn-off" type="submit" value="OFF" disabled="true">
+         </form>
+      </div>
+
+      <!-- <div>Trạng thái đèn: <b><span id="trangthaiD2"><span></b></div>
+         <br>
+         <div>Bắt chuyển động: <b><span id="trangThaiChuyenDong"><span></b></div>
+         <br>
+         <div>Giá trị ánh sáng: <b><span id="giaTriAnhSang"><span></b></div>
+         <br> -->
+   </div>
+
+   <!-- End  Control relay-->
+
+   <!--  -->
+
+
+   <span id="tem"></span>
+
+   <!--  -->
+
+   <!-- Start Save to SQL button -->
+   <form action="/Luu_Data" name="form" method="post" style=" margin-bottom: 10px;">
+      <input class="btn-clear" type="submit" name="buttonThongKe" value="Cập nhật Database" />
+   </form>
+   <form action="/Xoa_Data" name="form" method="post" style=" margin-bottom: 10px;">
+      <input class="btn-clear" type="submit" name="buttonThongKe" value="Clear Database" />
+   </form>
+   <!-- End Save to SQL button -->
+   <div class="container">
+
+      <div class="card">
+
+         <div class="card-body">
+            <div class="table-responsive">
+               <table class="table table-bordered">
+                  <tr>
+                     <th>ID</th>
+                     <th>Anh Sang</th>
+                     <th>Chuyen Dong</th>
+                     <th>Ngày</th>
+                     <th>Giờ</th>
+                  </tr>
+                  <tbody>
+                     <% if(sampleData.length> 0)
+                        {
+                        sampleData.forEach(function(data){
+                        %>
+                        <tr>
+                           <td>
+                              <%= data.id %>
+                           </td>
+
+                           <td>
+                              <%= data.anhSang %>
+                           </td>
+                           <td>
+                              <%= data.chuyenDong %>
+                           </td>
+                           <td>
+                              <%= data.Date %>
+                           </td>
+                           <td>
+                              <%= data.Time %>
+                           </td>
+
+                        </tr>
+                        <% }); } else { %>
+                           <tr>
+                              <td colspan="5">No Data Found</td>
+                           </tr>
+                           <% } %>
+                  </tbody>
+               </table>
+            </div>
+         </div>
+      </div>
+
+
+
+   </div>
+
+   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous">
+      </script>
+
+   <script>
+      var url = window.location.host; // hàm trả về url của trang hiện tại kèm theo port
+      var ws = new WebSocket('ws://' + url + '/ws');
+
+      function setTem(tem) {
+         console.log(tem)
+         var spanElement = document.querySelector("#tem");
+         spanElement.innerHTML = tem;
+         console.log(tem);
+      }
+
+      ws.onmessage = async (event) => {
+         const blob = new Blob([event.data])
+         blob.text().then(text => {
+            setTem(text)
+         })
+      }
+
+      
+      function manualActivate() {
+         document.getElementById("btnOn").disabled = false;
+         document.getElementById("btnOff").disabled = false;
+      }
+   </script>
+</body>
+
+</html>
